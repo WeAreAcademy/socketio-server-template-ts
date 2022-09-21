@@ -20,7 +20,14 @@ const storyWords: string[] = [];
 io.on("connection", (s: Socket) => {
     console.log("Got a connection.  Registering handlers...");
 
+    //useful for debugging
+    s.onAny((tag: string, ...otherArgs) =>
+        console.log("Received: ", tag, otherArgs, "(generic handler)")
+    );
+
+    //register to handle specific messages...
     s.on("addWord", (newWord: string) => {
+        storyWords.push(newWord);
         //tell everyone, including socket s
         io.emit("storyUpdate", storyWords);
     });
@@ -43,7 +50,6 @@ setInterval(() => {
 }, 20000);
 
 //express routes - optional
-
 app.get("/", (req, res) => {
     res.send("try POSTing {word: 'blah'} to /storyWords");
 });
@@ -56,7 +62,7 @@ app.post("/storyWords", (req, res) => {
 });
 
 const port = process.env.PORT ?? 4000;
-//important: call listen on the `server`, not the `app`.
-const listeningServer = server.listen(port, () => {
+//important: call listen on the *server*, not the `app` directly.
+server.listen(port, () => {
     console.log("socketio and express server listening on *:" + port);
 });
