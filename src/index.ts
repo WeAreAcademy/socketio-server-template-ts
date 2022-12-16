@@ -9,12 +9,14 @@ app.use(cors());
 
 const server = http.createServer(app);
 
+// make a socket.io server object.
 const io = new Server(server, {
     cors: {
         origin: "*",
     },
 });
 
+//our "database"
 const storyWords: string[] = [];
 
 io.on("connection", (s: Socket) => {
